@@ -6,19 +6,42 @@ const Apiwalker = () => {
 	const [id, setId] = useState('');
 	const [clicked, setClicked] = useState(1);
 	const [results, setResults] = useState({});
+	const [homeworld, setHomeworld] = useState('');
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
 	};
 
 	const apiCall = async () => {
-		const { data } = await axios.get(`https://swapi.dev/api/${category}/${id}`);
-		setResults(data);
+		const { data: mainResults } = await axios.get(
+			`https://swapi.dev/api/${category}/${id}`
+		);
+		const { data: homeWorldResults } = await axios.get(mainResults.homeworld);
+		setHomeworld(homeWorldResults.name);
+		setResults({
+			name: mainResults.name,
+			height: mainResults.height,
+			hair_color: mainResults.hair_color,
+			birth_year: mainResults.birth_year,
+		});
 	};
 
 	useEffect(() => {
 		apiCall();
 	}, [clicked]);
+
+	// useEffect(() => {
+	// 	// apiCall();
+	// 	axios.get(`https://swapi.dev/api/${category}/${id}`).then(({ data }) => {
+	// 		setResults(data);
+	// 	});
+	// }, [clicked]);
+
+	// useEffect(() => {
+	// 	axios.get(results.homeworld).then(({ data }) => {
+	// 		setHomeworld(data.name);
+	// 	});
+	// }, [clicked, results]);
 
 	return (
 		<>
@@ -52,12 +75,13 @@ const Apiwalker = () => {
 				/>
 			</form>
 			{/* {category}/{id} */}
+			{homeworld}
 			<div>
-				<h1>{results.name}</h1>
-				<p>height {results.height}</p>
-				<p>hair color {results.hair_color}</p>
-				<p>birth year {results.birth_year}</p>
-				<p>homeworld {results.homeworld}</p>
+				{results.name && <h1>{results.name}</h1>}
+				{results.height && <p>height {results.height}</p>}
+				{results.hair_color && <p>hair color {results.hair_color}</p>}
+				{results.birth_year && <p>birth year {results.birth_year}</p>}
+				{homeworld && <p>homeworld {homeworld}</p>}
 			</div>
 		</>
 	);
